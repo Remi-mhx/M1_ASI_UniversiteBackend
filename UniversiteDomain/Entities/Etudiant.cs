@@ -7,9 +7,11 @@ public class Etudiant
     public string Nom { get; set; } = string.Empty;
     public string Prenom { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public Parcours? ParcoursSuivi { get; set; } = null;
+    public List<Note>? Notes { get; set; } = new();
 
     public override string ToString()
     {
-        return $"ID {Id} : {NumEtud} - {Nom} {Prenom} inscrit en "/*+ParcoursSuivi*/;
+        return $"ID {Id} : {NumEtud} - {Nom} {Prenom} inscrit en "+ParcoursSuivi;
     }
 }
