@@ -15,17 +15,18 @@ public class AddEtudiantDansParcoursUseCase(IRepositoryFactory repositoryFactory
         return await ExecuteAsync(parcours.Id, etudiant.Id); 
     }  
     
-    public async Task<Parcours> ExecuteAsync(long idParcours, long idEtudiant)
-    {
-        await CheckBusinessRules(idParcours, idEtudiant); 
-        return await repositoryFactory.ParcoursRepository().AddEtudiantAsync(idParcours, idEtudiant);
-    }
-
+    
     public async Task<Parcours> ExecuteAsync(Parcours parcours, List<Etudiant> etudiants)
     {
         long[] idEtudiants = etudiants.Select(x => x.Id).ToArray();
         return await ExecuteAsync(parcours.Id, idEtudiants); 
     }  
+    
+    public async Task<Parcours> ExecuteAsync(long idParcours, long idEtudiant)
+    {
+        await CheckBusinessRules(idParcours, idEtudiant); 
+        return await repositoryFactory.ParcoursRepository().AddEtudiantAsync(idParcours, idEtudiant);
+    }
 
     public async Task<Parcours> ExecuteAsync(long idParcours, long [] idEtudiants)
     {

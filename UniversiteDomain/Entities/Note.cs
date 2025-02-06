@@ -2,14 +2,14 @@
 
 public class Note
 {
+    public float Valeur { get; set; }
     public long IdEtudiant { get; set; }
     public long IdUe { get; set; }
-    public float Valeur { get; set; }
-    public Etudiant? Etudiant { get; set; } = null;
-    public Ue? Ue { get; set; } = null;
-
+    public Etudiant Etudiant { get; set; }
+    public Ue Ue { get; set; }
+        
     public override string ToString()
     {
-        return "Note de "+Valeur+" pour "+Etudiant+" en "+Ue;
+        return "Note de "+Valeur +" pour l'étudiant "+Etudiant.Nom+" "+Etudiant.Prenom+" en "+Ue.Intitule;
     }
 }

@@ -4,5 +4,4 @@ namespace UniversiteDomain.DataAdapters;
 
 public interface INoteRepository : IRepository<Note>
 {
-    
 }

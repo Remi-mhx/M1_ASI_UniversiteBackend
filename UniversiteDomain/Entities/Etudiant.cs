@@ -8,7 +8,7 @@ public class Etudiant
     public string Prenom { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public Parcours? ParcoursSuivi { get; set; } = null;
-    public List<Note>? Notes { get; set; } = new();
+    public List<Note>? NotesObtenues { get; set; } = new();
 
     public override string ToString()
     {

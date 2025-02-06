@@ -8,48 +8,36 @@ public class CreateNoteUseCase(IRepositoryFactory repositoryFactory)
 {
     public async Task<Note> ExecuteAsync(float valeur, long idEtudiant, long idUe)
     {
-        var note = new Note
-        {
-            Valeur = valeur,
-            Etudiant = new Etudiant {Id = idEtudiant},
-            Ue = new Ue {Id = idUe}
-        };
+        var note = new Note{Valeur = valeur, IdEtudiant = idEtudiant, IdUe = idUe};
         return await ExecuteAsync(note);
     }
-
     public async Task<Note> ExecuteAsync(Note note)
     {
-        Note newNote = await repositoryFactory.NoteRepository().CreateAsync(note);
-        await CheckBusinessRules(newNote);
+        await CheckBusinessRules(note);
+        Note n = await repositoryFactory.NoteRepository().CreateAsync(note);
         repositoryFactory.NoteRepository().SaveChangesAsync().Wait();
-        return newNote;
+        return n;
     }
-
     private async Task CheckBusinessRules(Note note)
     {
         ArgumentNullException.ThrowIfNull(note);
         ArgumentNullException.ThrowIfNull(note.Valeur);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(note.Valeur);
-        ArgumentNullException.ThrowIfNull(note.Etudiant);
-        ArgumentNullException.ThrowIfNull(note.Ue);
-        ArgumentNullException.ThrowIfNull(repositoryFactory.NoteRepository());
+        ArgumentNullException.ThrowIfNull(note.IdEtudiant);
+        ArgumentNullException.ThrowIfNull(note.IdUe);
         
-        if (note.Valeur < 0 || note.Valeur > 20)
-        {
-            throw new OutRangeNoteException("La note doit être comprise entre 0 et 20");
-        }
+        // Un étudiant n'a qu'une note par Ue
+        List<Note> existe = await repositoryFactory.NoteRepository().FindByConditionAsync
+            (e=>e.IdEtudiant.Equals(note.IdEtudiant) && e.IdUe.Equals(note.IdUe));
         
-        List<Note> noteList = await repositoryFactory.NoteRepository().FindByConditionAsync(p => p.Etudiant.Id == note.Etudiant.Id && p.Ue.Id == note.Ue.Id);
-        if (noteList is {Count:>0})
-        {
-            throw new DuplicateNoteException("Une note pour cet étudiant et cette UE existe déjà");
-        }
+        // Si une note pour cet étudiant et cette UE existe déjà, on lève une exception personnalisée
+        if (existe is {Count:>0}) throw new DuplicateNoteException("Une note pour cet étudiant et cette UE existe déjà");
         
-        List<Parcours> parcours = await repositoryFactory.ParcoursRepository().FindByConditionAsync(p => p.Inscrits.Any(e => e.Id == note.Etudiant.Id) && p.UesEnseignees.Any(u => u.Id == note.Ue.Id));
-        if(parcours is {Count:0})
-        {
-            throw new ParcoursNotFoundException("L'étudiant n'est pas inscrit dans cette UE");
-        }
+        // La note doit être comprise entre 0 et 20
+        if (note.Valeur < 0 || note.Valeur > 20) throw new ValeurNoteException("La note doit être comprise entre 0 et 20");
+        
+        // Un étudiant ne peut avoir une note que dans une Ue du parcours dans lequel il est inscrit
+        Ue ue = await repositoryFactory.UeRepository().FindAsync(note.IdUe) ?? throw new InvalidOperationException("L'UE n'existe pas");
+        Etudiant etudiant = await repositoryFactory.EtudiantRepository().FindAsync(note.IdEtudiant) ?? throw new InvalidOperationException("L'étudiant n'existe pas");
+        if(!etudiant.ParcoursSuivi.UesEnseignees.Contains(ue)) throw new UeNonInscriteException("L'étudiant n'est pas inscrit à cette UE");
     }
-    
 }

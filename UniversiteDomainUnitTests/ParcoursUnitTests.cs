@@ -24,14 +24,10 @@ public class ParcoursUnitTests
         
         // On crée le parcours qui doit être ajouté en base
         Parcours parcoursAvant = new Parcours{NomParcours = nomParcours, AnneeFormation = anneFormation};
-        
-        // On initialise une fausse datasource qui va simuler un EtudiantRepository
+         
         var mockParcours = new Mock<IParcoursRepository>();
         
-        // Il faut ensuite aller dans le use case pour simuler les appels des fonctions vers la datasource
-        // Nous devons simuler FindByCondition et Create
-        // On dit à ce mock que le parcours n'existe pas déjà
-
+        
         mockParcours
             .Setup(repo=>repo.FindByConditionAsync(p=>p.Id.Equals(idParcours)))
             .ReturnsAsync((List<Parcours>)null);
