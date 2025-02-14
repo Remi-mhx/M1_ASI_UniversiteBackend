@@ -2,7 +2,7 @@
 
 namespace UniversiteDomain.DataAdapters;
 
-public interface IUniversiteUserRepository : IRepository<IUniversiteRole>
+public interface IUniversiteUserRepository : IRepository<IUniversiteUser>
 {
     Task<IUniversiteUser?> AddUserAsync(string login, string email, string password, string role, Etudiant? etudiant);
     Task<IUniversiteUser> FindByEmailAsync(string email);

@@ -1,16 +1,23 @@
-﻿using UniversiteDomain.DataAdapters;
+﻿using Microsoft.AspNetCore.Identity;
+using UniversiteDomain.DataAdapters;
 using UniversiteDomain.DataAdapters.DataAdaptersFactory;
 using UniversiteEFDataProvider.Data;
+using UniversiteEFDataProvider.Entities;
 using UniversiteEFDataProvider.Repositories;
 
-namespace UniversiteEFDataProvider.RepositoryFactories;
+namespace UniversiteEFDataProvider.RepositoryFactory;
 
-public class RepositoryFactory (UniversiteDbContext context): IRepositoryFactory
+public class RepositoryFactory (
+    UniversiteDbContext context,
+    RoleManager<UniversiteRole> roleManager,
+    UserManager<UniversiteUser> userManager): IRepositoryFactory
 {
     private IParcoursRepository? _parcours;
     private IEtudiantRepository? _etudiants;
     private IUeRepository? _ues;
     private INoteRepository? _notes;
+    private IUniversiteRoleRepository? _universiteRole;
+    private IUniversiteUserRepository? _universiteUser;
     
     public IParcoursRepository ParcoursRepository()
     {
@@ -47,6 +54,33 @@ public class RepositoryFactory (UniversiteDbContext context): IRepositoryFactory
         }
         return _notes;
 
+    }
+    
+    public IUniversiteRoleRepository UniversiteRoleRepository()
+    {
+        if (_universiteRole == null)
+        {
+            _universiteRole = new UniversiteRoleRepository(
+                context ?? throw new InvalidOperationException(),
+                roleManager ?? throw new InvalidOperationException()
+                );
+        }
+        return _universiteRole;
+    }
+    
+    public IUniversiteUserRepository UniversiteUserRepository()
+    {
+        //get RoleManager<UniversiteRole> roleManager<UniversiteRole> roleManager
+        
+        if (_universiteUser == null)
+        {
+            _universiteUser = new UniversiteUserRepository(
+                context ?? throw new InvalidOperationException(),
+                userManager ?? throw new InvalidOperationException(),
+                roleManager ?? throw new InvalidOperationException()
+                );
+        }
+        return _universiteUser;
     }
        
     public async Task SaveChangesAsync()
