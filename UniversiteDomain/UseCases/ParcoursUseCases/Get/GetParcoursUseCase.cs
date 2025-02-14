@@ -16,4 +16,9 @@ public class GetParcoursUseCase(IRepositoryFactory repositoryFactory)
     {
         ArgumentNullException.ThrowIfNull(parcours);
     }
+    
+    public bool IsAuthorized(string role)
+    {
+        return role.Equals(Roles.Responsable) || role.Equals(Roles.Scolarite) || role.Equals(Roles.Etudiant);
+    }
 }

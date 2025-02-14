@@ -14,6 +14,10 @@ public class GetUeUseCase(IRepositoryFactory repositoryFactory)
 
     private async Task CheckBusinessRules(Ue? ue)
     {
-        ArgumentNullException.ThrowIfNull(ue);
+    }
+    
+    public bool IsAuthorized(string role)
+    {
+        return role.Equals(Roles.Responsable) || role.Equals(Roles.Scolarite) || role.Equals(Roles.Etudiant);
     }
 }

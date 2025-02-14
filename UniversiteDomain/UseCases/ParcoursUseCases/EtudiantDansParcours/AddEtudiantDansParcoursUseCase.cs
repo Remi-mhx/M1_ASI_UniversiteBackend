@@ -62,4 +62,9 @@ public class AddEtudiantDansParcoursUseCase(IRepositoryFactory repositoryFactory
         if (inscrit is { Count: > 0 }) throw new DuplicateParcoursException(idEtudiant + " est déjà inscrit dans le parcours dans le parcours : " + idParcours);
         
     }
+    
+    public bool IsAuthorized(string role)
+    {
+        return role.Equals(Roles.Responsable) || role.Equals(Roles.Scolarite);
+    }
 }

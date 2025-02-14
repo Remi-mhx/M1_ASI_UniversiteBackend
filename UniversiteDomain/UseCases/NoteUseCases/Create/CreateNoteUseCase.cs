@@ -46,4 +46,9 @@ public class CreateNoteUseCase(IRepositoryFactory repositoryFactory)
         if (existe is {Count:>0}) throw new DuplicateNoteException("Une note pour cet étudiant et cette UE existe déjà");
         
     }
+    
+    public bool IsAuthorized(string role)
+    {
+        return role.Equals(Roles.Responsable) || role.Equals(Roles.Scolarite);
+    }
 }

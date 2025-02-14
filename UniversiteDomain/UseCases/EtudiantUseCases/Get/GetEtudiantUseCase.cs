@@ -16,4 +16,9 @@ public class GetEtudiantUseCase(IRepositoryFactory repositoryFactory)
     {
         ArgumentNullException.ThrowIfNull(etudiant);
     }
+    
+    public bool IsAuthorized(string role)
+    {
+        return role.Equals(Roles.Responsable) || role.Equals(Roles.Scolarite) || role.Equals(Roles.Etudiant);
+    }
 }

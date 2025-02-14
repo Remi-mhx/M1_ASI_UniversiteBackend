@@ -14,4 +14,9 @@ public class GetAllParcoursUseCase(IRepositoryFactory repositoryFactory)
     private async Task CheckBusinessRules(List<Parcours> parcours)
     {
     }
+    
+    public bool IsAuthorized(string role)
+    {
+        return role.Equals(Roles.Responsable) || role.Equals(Roles.Scolarite) || role.Equals(Roles.Etudiant);
+    }
 }
