@@ -8,7 +8,7 @@ public class NoteDto
     public EtudiantDto Etudiant { get; set; }
     public UeDto Ue { get; set; }
     
-    public NoteDto ToDto(Entities.Note note)
+    public NoteDto ToDto(Note note)
     {
         Valeur = note.Valeur;
         Etudiant = new EtudiantDto().ToDto(note.Etudiant);
