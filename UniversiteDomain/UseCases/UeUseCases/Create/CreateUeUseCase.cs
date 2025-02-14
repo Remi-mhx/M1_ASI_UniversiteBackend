@@ -19,8 +19,8 @@ public class CreateUeUseCase(IRepositoryFactory repositoryFactory)
     
     public async Task<Ue> ExecuteAsync(Ue ue)
     {
-        Ue newUe = await repositoryFactory.UeRepository().CreateAsync(ue);
         await CheckBusinessRules(ue);
+        Ue newUe = await repositoryFactory.UeRepository().CreateAsync(ue);
         repositoryFactory.UeRepository().SaveChangesAsync().Wait();
         return newUe;
     }

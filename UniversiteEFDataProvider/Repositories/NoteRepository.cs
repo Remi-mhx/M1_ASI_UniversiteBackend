@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using UniversiteDomain.DataAdapters;
 using UniversiteDomain.Entities;
 using UniversiteEFDataProvider.Data;
@@ -27,7 +27,7 @@ public class NoteRepository(UniversiteDbContext context) : Repository<Note>(cont
     public async Task<double> GetNoteAsync(long idEtudiant, long idUe)
     {
         ArgumentNullException.ThrowIfNull(Context.Notes);
-        return (await Context.Notes.FirstOrDefaultAsync(n => n.IdEtudiant == idEtudiant && n.IdUe == idUe))?.Valeur ?? 0;
+        return (await Context.Notes.FirstOrDefaultAsync(n => n.Etudiant.Id == idEtudiant && n.Ue.Id == idUe))?.Valeur ?? 0;
     }
     
     public async Task<double> GetNoteAsync(Etudiant etudiant, Ue ue)
@@ -42,7 +42,7 @@ public class NoteRepository(UniversiteDbContext context) : Repository<Note>(cont
     public async Task<IEnumerable<Note>> GetNotesAsync(long idUe)
     {
         ArgumentNullException.ThrowIfNull(Context.Notes);
-        return await Context.Notes.Where(n => n.IdUe == idUe).ToListAsync();
+        return await Context.Notes.Where(n => n.Ue.Id == idUe).ToListAsync();
     }
     
     public async Task<IEnumerable<Note>> GetNotesAsync(Ue ue)
@@ -53,7 +53,7 @@ public class NoteRepository(UniversiteDbContext context) : Repository<Note>(cont
     public async Task<IEnumerable<Note>> GetNotesAsync(long idEtudiant, long idUe)
     {
         ArgumentNullException.ThrowIfNull(Context.Notes);
-        return await Context.Notes.Where(n => n.IdEtudiant == idEtudiant && n.IdUe == idUe).ToListAsync();
+        return await Context.Notes.Where(n => n.Etudiant.Id == idEtudiant && n.Ue.Id == idUe).ToListAsync();
     }
     
     public async Task<IEnumerable<Note>> GetNotesAsync(Etudiant etudiant, Ue ue)

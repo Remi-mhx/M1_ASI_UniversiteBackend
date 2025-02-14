@@ -20,8 +20,8 @@ public class CreateParcoursUseCase(IRepositoryFactory repositoryFactory)
     
     public async Task<Parcours> ExecuteAsync(Parcours parcours)
     {
+        await CheckBusinessRules(parcours);
         Parcours newParcours = await repositoryFactory.ParcoursRepository().CreateAsync(parcours);
-        await CheckBusinessRules(newParcours);
         repositoryFactory.ParcoursRepository().SaveChangesAsync().Wait();
         return newParcours;
     }
