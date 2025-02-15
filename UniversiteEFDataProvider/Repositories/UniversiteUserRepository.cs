@@ -26,6 +26,22 @@ public class UniversiteUserRepository(
         return result.Succeeded ? user : null;
         return user;
     }
+    
+    public async Task<IUniversiteUser?> UpdateUserAsync(Etudiant? etudiant)
+    {
+        UniversiteUser user = await userManager.FindByEmailAsync(etudiant.Email);
+        if (user != null)
+        {
+            user.UserName = etudiant.Email;
+            user.Email = etudiant.Email;
+            user.Etudiant = etudiant;
+
+            await userManager.UpdateAsync(user);
+            await context.SaveChangesAsync();
+            return user;
+        }
+        return null;
+    }
 
     public async Task<IUniversiteUser> FindByEmailAsync(string email)
     {

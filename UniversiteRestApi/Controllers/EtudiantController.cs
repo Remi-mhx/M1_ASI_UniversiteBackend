@@ -7,6 +7,7 @@ using UniversiteDomain.UseCases.EtudiantUseCases.Create;
 using UniversiteDomain.Dtos;
 using UniversiteDomain.UseCases.EtudiantUseCases.Delete;
 using UniversiteDomain.UseCases.EtudiantUseCases.Get;
+using UniversiteDomain.UseCases.EtudiantUseCases.Update;
 using UniversiteDomain.UseCases.SecurityUseCases.Create;
 using UniversiteDomain.UseCases.SecurityUseCases.Get;
 using UniversiteEFDataProvider.Entities;
@@ -61,6 +62,42 @@ namespace UniversiteRestApi.Controllers
             EtudiantDto dto = new EtudiantDto().ToDto(etudiant);
             return Ok(dto);
         }
+        
+        // Définissons une nouvelle route pour ne pas créer de conflit avec le get de base
+// GET api/<EtudiantController>/complet/5
+        [HttpGet("complet/{id}")]
+        public async Task<ActionResult<EtudiantCompletDto>> GetUnEtudiantCompletAsync(long id)
+        {
+            // Identification et authentification
+            string role="";
+            string email="";
+            IUniversiteUser user = null;
+            try
+            {
+                CheckSecu(out role, out email, out user);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized();
+            }
+    
+            GetEtudiantCompletUseCase uc = new GetEtudiantCompletUseCase(repositoryFactory);
+            // Autorisation
+            // On vérifie si l'utilisateur connecté a le droit d'accéder à la ressource
+            if (!uc.IsAuthorized(role, user, id)) return Unauthorized();
+            Etudiant? etud;
+            try
+            {
+                etud = await uc.ExecuteAsync(id);
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(nameof(e), e.Message);
+                return ValidationProblem();
+            }
+            if (etud == null) return NotFound();
+            return new EtudiantCompletDto().ToDto(etud);
+        }
 
         // Crée un nouvel étudiant sans parcours
         // POST api/<EtudiantController>
@@ -73,8 +110,8 @@ namespace UniversiteRestApi.Controllers
             string role="";
             string email="";
             IUniversiteUser user = null;
-            CheckSecu(out role, out email, out user);
             if(!createUserUc.IsAuthorized(role) || !createEtudiantUc.IsAuthorized(role)) return Unauthorized();
+            CheckSecu(out role, out email, out user);
             
             Etudiant etud = etudiantDto.ToEntity();
             try
@@ -111,14 +148,75 @@ namespace UniversiteRestApi.Controllers
         
         // PUT api/<EtudiantController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<ActionResult<EtudiantDto>> PutAsync(long id, [FromBody] EtudiantDto etudiantDto)
         {
+            UpdateEtudiantUseCase updateEtudiantUc = new UpdateEtudiantUseCase(repositoryFactory);
+            UpdateUniversiteUserUseCase updateUserUc = new UpdateUniversiteUserUseCase(repositoryFactory);
+
+            if (id != etudiantDto.Id)
+            {
+                return BadRequest();
+            }
+            string role="";
+            string email="";
+            IUniversiteUser user = null;
+            try
+            {
+                CheckSecu(out role, out email, out user);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized();
+            }
+            if (!updateEtudiantUc.IsAuthorized(role)|| !updateUserUc.IsAuthorized(role)) return Unauthorized();
+            // Mise à jour de l'étudiant
+            try
+            {
+                await updateUserUc.ExecuteAsync(etudiantDto.ToEntity());
+                await updateEtudiantUc.ExecuteAsync(etudiantDto.ToEntity());
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(nameof(e), e.Message);
+                return ValidationProblem();
+            }
+            
+            return NoContent();
         }
+
 
         // DELETE api/<EtudiantController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult<Parcours>> DeleteAsync(long id)
         {
+            DeleteEtudiantUseCase etudiantUc = new DeleteEtudiantUseCase(repositoryFactory);
+            DeleteUniversiteUserUseCase userUc = new DeleteUniversiteUserUseCase(repositoryFactory);
+            string role = "";
+            string email = "";
+            IUniversiteUser user = null;
+            try
+            {
+                CheckSecu(out role, out email, out user);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized();
+            }
+
+            if (!etudiantUc.IsAuthorized(role) || !userUc.IsAuthorized(role)) return Unauthorized();
+            // On supprime l'étudiant et le user avec l'Id id
+            try
+            {
+                await userUc.ExecuteAsync(id);
+                await etudiantUc.ExecuteAsync(id);
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(nameof(e), e.Message);
+                return ValidationProblem();
+            }
+
+            return NoContent();
         }
         
         private void CheckSecu(out string role, out string email, out IUniversiteUser user)
