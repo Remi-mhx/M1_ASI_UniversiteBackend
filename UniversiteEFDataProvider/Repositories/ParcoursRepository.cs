@@ -58,18 +58,17 @@ public class ParcoursRepository(UniversiteDbContext context) : Repository<Parcou
         ArgumentNullException.ThrowIfNull(Context.Etudiants);
         Parcours p = (await Context.Parcours.FindAsync(idParcours))!;
         Etudiant e = (await Context.Etudiants.FindAsync(idEtudiant))!;
+        ArgumentNullException.ThrowIfNull(e);
+        ArgumentNullException.ThrowIfNull(p);
         p.Inscrits.Add(e);
+        e.ParcoursSuivi = p;
         await Context.SaveChangesAsync();
         return p;
     }
     
     public async Task<Parcours> AddEtudiantAsync(Parcours parcours, Etudiant etudiant)
     {
-        ArgumentNullException.ThrowIfNull(Context.Parcours);
-        ArgumentNullException.ThrowIfNull(Context.Etudiants);
-        Parcours p = await AddEtudiantAsync(parcours.Id, etudiant.Id);
-        await Context.SaveChangesAsync();
-        return p;
+        return await AddEtudiantAsync(parcours.Id, etudiant.Id);
     }
     
     public async Task<Parcours> AddEtudiantAsync(Parcours ? parcours, List<Etudiant> etudiants)
@@ -97,5 +96,14 @@ public class ParcoursRepository(UniversiteDbContext context) : Repository<Parcou
         }
         await Context.SaveChangesAsync();
         return p;
+    }
+    
+    public async Task<Parcours?> FindParcoursCompletAsync(long idParcours)
+    {
+        ArgumentNullException.ThrowIfNull(Context.Parcours);
+        return await Context.Parcours
+            .Include(p => p.UesEnseignees)
+            .Include(p => p.Inscrits)
+            .FirstOrDefaultAsync(p => p.Id == idParcours);
     }
 }

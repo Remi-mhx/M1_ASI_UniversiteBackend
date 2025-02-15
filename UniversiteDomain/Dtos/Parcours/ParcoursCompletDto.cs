@@ -16,8 +16,8 @@ public class ParcoursCompletDto
         Id = parcours.Id;
         NomParcours = parcours.NomParcours;
         AnneeFormation = parcours.AnneeFormation;
-        Ues = parcours.UesEnseignees?.Select(ue => new UeDto().ToDto(ue)).ToList();
-        Inscrits = parcours.Inscrits?.Select(etudiant => new EtudiantDto().ToDto(etudiant)).ToList();
+        if (parcours.UesEnseignees != null) Ues = parcours.UesEnseignees?.Select(ue => new UeDto().ToDto(ue)).ToList();
+        if (parcours.Inscrits != null) Inscrits = parcours.Inscrits?.Select(etudiant => new EtudiantDto().ToDto(etudiant)).ToList();
         return this;
     }
     

@@ -9,8 +9,8 @@ public class EtudiantCompletDto
     public string Nom { get; set; }
     public string Prenom { get; set; }
     public string Email { get; set; }
-    public ParcoursDto ParcoursSuivi { get; set; }
-    public List<NoteAvecUeDto> NotesObtenues { get; set; }=new();
+    public ParcoursDto ParcoursSuivi { get; set; } = new();
+    public List<NoteAvecUeDto> NotesObtenues { get; set; } = new();
 
     public EtudiantCompletDto ToDto(Etudiant etudiant)
     {
@@ -22,7 +22,7 @@ public class EtudiantCompletDto
         if (etudiant.ParcoursSuivi != null) ParcoursSuivi = new ParcoursDto().ToDto(etudiant.ParcoursSuivi);
         if (etudiant.NotesObtenues != null)
         {
-            NotesObtenues = NoteAvecUeDto.ToDtos(etudiant.NotesObtenues);
+            NotesObtenues = new NoteAvecUeDto().ToDtos(etudiant.NotesObtenues);
         }
         
         return this;
@@ -30,7 +30,16 @@ public class EtudiantCompletDto
     
     public Etudiant ToEntity()
     {
-        List<Note> notes = NoteAvecUeDto.ToEntities(NotesObtenues);
-        return new Etudiant {Id = this.Id, NumEtud = this.NumEtud, Nom = this.Nom, Prenom = this.Prenom, Email = this.Email, NotesObtenues = notes};
+        List<Note> notes = new NoteAvecUeDto().ToEntities(this.NotesObtenues);
+        return new Etudiant
+        {
+            Id = this.Id,
+            NumEtud = this.NumEtud,
+            Nom = this.Nom,
+            Prenom = this.Prenom,
+            Email = this.Email,
+            NotesObtenues = notes,
+            ParcoursSuivi = this.ParcoursSuivi.ToEntity() 
+        };
     }
 }

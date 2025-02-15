@@ -64,23 +64,23 @@ using(var scope = app.Services.CreateScope())
     logger.LogInformation("Initialisation de la base de données");
     // Suppression de la BD
     // logger.LogInformation("Suppression de la BD si elle existe");
-    // await context.Database.EnsureDeletedAsync();
+    await context.Database.EnsureDeletedAsync();
     // Recréation des tables vides
     // logger.LogInformation("Création de la BD et des tables à partir des entities");
-    // await context.Database.EnsureCreatedAsync();
+    await context.Database.EnsureCreatedAsync();
 }
 
 // Initisation de la base de données
-// ILogger loggerBd = app.Services.GetRequiredService<ILogger<BdBuilder>>();
-// loggerBd.LogInformation("Chargement des données de test");
-// using(var scope = app.Services.CreateScope())
-// {
-//     UniversiteDbContext context = scope.ServiceProvider.GetRequiredService<UniversiteDbContext>();
-//     IRepositoryFactory repositoryFactory = scope.ServiceProvider.GetRequiredService<IRepositoryFactory>();   
-//     // C'est ici que vous changez le jeu de données pour démarrer sur une base vide par exemple
-//     BdBuilder seedBD = new BasicBdBuilder(repositoryFactory);
-//     await seedBD.BuildUniversiteBdAsync();
-// }
+ILogger loggerBd = app.Services.GetRequiredService<ILogger<BdBuilder>>();
+loggerBd.LogInformation("Chargement des données de test");
+using(var scope = app.Services.CreateScope())
+{
+    UniversiteDbContext context = scope.ServiceProvider.GetRequiredService<UniversiteDbContext>();
+    IRepositoryFactory repositoryFactory = scope.ServiceProvider.GetRequiredService<IRepositoryFactory>();   
+    // C'est ici que vous changez le jeu de données pour démarrer sur une base vide par exemple
+    BdBuilder seedBD = new BasicBdBuilder(repositoryFactory);
+    await seedBD.BuildUniversiteBdAsync();
+}
 
 // Sécurisation
 app.UseAuthorization();

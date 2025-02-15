@@ -16,7 +16,7 @@ public class CreateNoteUseCase(IRepositoryFactory repositoryFactory)
     public async Task<Note> ExecuteAsync(Note note)
     {
         await CheckBusinessRules(note);
-        Note n = await repositoryFactory.NoteRepository().CreateAsync(note);
+        Note n = await repositoryFactory.NoteRepository().CreateNoteAsync(note);
         repositoryFactory.NoteRepository().SaveChangesAsync().Wait();
         return n;
     }
@@ -36,7 +36,7 @@ public class CreateNoteUseCase(IRepositoryFactory repositoryFactory)
         Ue ue = await repositoryFactory.UeRepository().FindAsync(note.UeId) ?? throw new InvalidOperationException("L'UE n'existe pas");
 
         
-        if(!etudiant.ParcoursSuivi.UesEnseignees.Contains(ue)) throw new UeNonInscriteException("L'étudiant n'est pas inscrit à cette UE");
+        if(etudiant.ParcoursSuivi == null || !etudiant.ParcoursSuivi.UesEnseignees.Contains(ue)) throw new UeNonInscriteException("L'étudiant n'est pas inscrit à cette UE");
 
         // Un étudiant n'a qu'une note par Ue
         List<Note> existe = await repositoryFactory.NoteRepository().FindByConditionAsync

@@ -58,6 +58,25 @@ namespace UniversiteRestApi.Controllers
             ParcoursDto dto = new ParcoursDto().ToDto(parcours);
             return Ok(dto);
         }
+        
+        // GET api/<ParcoursController>/5
+        [HttpGet("{id}/complet")]
+        public async Task<ActionResult<ParcoursCompletDto>> GetParcoursComplet(long id)
+        {
+            GetParcoursCompletUseCase getParcoursUc = new GetParcoursCompletUseCase(repositoryFactory);
+            Parcours parcours = new Parcours();
+            try
+            {
+                parcours = await getParcoursUc.ExecuteAsync(id);
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(nameof(e), e.Message);
+                return ValidationProblem();
+            }
+            ParcoursCompletDto dto = new ParcoursCompletDto().ToDto(parcours);
+            return Ok(dto);
+        }
 
         // POST api/<ParcoursController>
         [HttpPost]

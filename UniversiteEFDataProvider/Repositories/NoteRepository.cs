@@ -1,28 +1,36 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UniversiteDomain.DataAdapters;
 using UniversiteDomain.Entities;
+using UniversiteDomain.UseCases.SecurityUseCases.Create;
 using UniversiteEFDataProvider.Data;
 
 namespace UniversiteEFDataProvider.Repositories;
 
 public class NoteRepository(UniversiteDbContext context) : Repository<Note>(context), INoteRepository
 {
-    public async Task AffecterNoteAsync(long idEtudiant, long idUe, float note)
+    public async Task<Note> CreateNoteAsync(Note note)
+    {
+        return await CreateNoteAsync(note.EtudiantId, note.UeId, note.Valeur);
+    }
+    
+    public async Task<Note> CreateNoteAsync(Etudiant etudiant, Ue ue, float note)
+    {
+        return await CreateNoteAsync(etudiant.Id, ue.Id, note);
+    }
+    
+    public async Task<Note> CreateNoteAsync(long idEtudiant, long idUe, float note)
     {
         ArgumentNullException.ThrowIfNull(Context.Etudiants);
         ArgumentNullException.ThrowIfNull(Context.Ues);
-        Etudiant e = (await Context.Etudiants.FindAsync(idEtudiant))!;
+        ArgumentNullException.ThrowIfNull(Context.Notes);
+        Etudiant etudiant = (await Context.Etudiants.FindAsync(idEtudiant))!;
         Ue ue = (await Context.Ues.FindAsync(idUe))!;
-        Note n = new Note { Etudiant = e, Ue = ue, Valeur = note };
-        Context.Notes.Add(n);
+        Note n = new Note {Valeur = note, Etudiant = etudiant, Ue = ue};
+        await Context.AddAsync(n);
         await Context.SaveChangesAsync();
+        return n;
     }
-    
-    public async Task<Etudiant> AffecterNoteAsync(Etudiant etudiant, Ue ue, float note)
-    {
-        await AffecterNoteAsync(etudiant.Id, ue.Id, note);
-        return etudiant;
-    }
+
     
     public async Task<double> GetNoteAsync(long idEtudiant, long idUe)
     {
