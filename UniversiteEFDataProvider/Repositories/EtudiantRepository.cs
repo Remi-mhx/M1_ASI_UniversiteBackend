@@ -32,4 +32,13 @@ public class EtudiantRepository(UniversiteDbContext context) : Repository<Etudia
             .FirstOrDefaultAsync(e => e.Id == idEtudiant);
 
     }
+    
+    public async Task<Etudiant?> FindParcoursUes(long idEtudiant)
+    {
+        ArgumentNullException.ThrowIfNull(Context.Etudiants);
+        return await Context.Etudiants
+            .Include(e => e.ParcoursSuivi)
+            .ThenInclude(p => p.UesEnseignees)
+            .FirstOrDefaultAsync(e => e.Id == idEtudiant);
+    }
 }

@@ -32,7 +32,7 @@ public class CreateNoteUseCase(IRepositoryFactory repositoryFactory)
         ArgumentNullException.ThrowIfNull(note.EtudiantId);
         ArgumentNullException.ThrowIfNull(note.UeId);
         
-        Etudiant etudiant = await repositoryFactory.EtudiantRepository().FindAsync(note.EtudiantId) ?? throw new InvalidOperationException("L'étudiant n'existe pas");
+        Etudiant etudiant = await repositoryFactory.EtudiantRepository().FindParcoursUes(note.EtudiantId) ?? throw new InvalidOperationException("L'étudiant n'existe pas");
         Ue ue = await repositoryFactory.UeRepository().FindAsync(note.UeId) ?? throw new InvalidOperationException("L'UE n'existe pas");
 
         
