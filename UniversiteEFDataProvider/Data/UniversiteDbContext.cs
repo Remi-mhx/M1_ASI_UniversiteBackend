@@ -85,7 +85,8 @@ public class UniversiteDbContext : IdentityDbContext<UniversiteUser>
         // ManyToOne vers Ue
         modelBuilder.Entity<Note>()
             .HasOne(n => n.Ue)
-            .WithMany(ue => ue.Notes);
+            .WithMany(ue => ue.Notes)
+            .HasForeignKey(n => n.UeId);
         
         // Propriétés de la table UniversiteUser
         //OneToOne vers UniversityUser
