@@ -56,7 +56,9 @@ public class ParcoursRepository(UniversiteDbContext context) : Repository<Parcou
     {
         ArgumentNullException.ThrowIfNull(Context.Parcours);
         ArgumentNullException.ThrowIfNull(Context.Etudiants);
-        Parcours p = (await Context.Parcours.FindAsync(idParcours))!;
+        Parcours p = (await Context.Parcours
+            .Include(p => p.UesEnseignees)
+            .FirstOrDefaultAsync(p => p.Id == idParcours))!;
         Etudiant e = (await Context.Etudiants.FindAsync(idEtudiant))!;
         ArgumentNullException.ThrowIfNull(e);
         ArgumentNullException.ThrowIfNull(p);
